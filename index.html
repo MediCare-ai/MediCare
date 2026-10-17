@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Umer MediCare - Practice Site</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<meta property="og:title" content="Umer MediCare">
+<meta property="og:description" content="Order medicines online and checkout on WhatsApp.">
+<meta property="og:image" content="logo.png">
+<meta name="description" content="Umer MediCare - order medicines online and checkout on WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #4fb286;
+    --green-dark: #3d9470;
+    --green-soft: #e6f5ee;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #ffffff;
+    --wa: #25d366;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    background: #f8fafb;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 16px; }
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .brand { font-family: "Poppins", "Inter", sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--green-dark); }
+  .brand span { color: var(--text); }
+  .brand-wrap { display: flex; align-items: center; gap: 10px; }
+  .logo { height: 44px; width: auto; display: block; }
+  .logo-placeholder {
+    width: 44px; height: 44px; border-radius: 10px;
+    border: 2px dashed var(--green); color: var(--green-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: .05em;
+    background: var(--green-soft);
+  }
+  .cart-btn {
+    background: var(--green); color: #fff; border: none; border-radius: 999px;
+    padding: 10px 18px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+  }
+  .cart-btn:hover { background: var(--green-dark); }
+  .address-line {
+    font-size: 0.85rem; color: var(--muted); margin-top: 8px;
+  }
+  .address-line button {
+    background: none; border: none; color: var(--green-dark);
+    font-weight: 600; cursor: pointer; text-decoration: underline;
+  }
+  .controls {
+    display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap;
+  }
+  .controls input[type="search"] {
+    flex: 1; min-width: 200px; padding: 10px 14px;
+    border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem;
+  }
+  .controls input:focus { outline: 2px solid var(--green); border-color: transparent; }
+  .filters { display: flex; gap: 8px; }
+  .filter-btn {
+    padding: 9px 16px; border-radius: 10px; border: 1px solid var(--border);
+    background: #fff; cursor: pointer; font-size: 0.9rem; color: var(--text);
+  }
+  .filter-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+
+  main { padding: 24px 0 90px; }
+  .count { color: var(--muted); font-size: 0.9rem; margin-bottom: 14px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px;
+    overflow: hidden; display: flex; flex-direction: column;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .card:hover { box-shadow: 0 8px 22px rgba(22,163,74,.12); transform: translateY(-2px); }
+  .card img { width: 100%; height: 150px; object-fit: cover; background: #f3f4f6; }
+  .card-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .tag {
+    align-self: flex-start; font-size: 0.72rem; font-weight: 600;
+    background: var(--green-soft); color: var(--green-dark);
+    padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .03em;
+  }
+  .name { font-weight: 600; font-size: 0.95rem; min-height: 2.6em; }
+  .price { font-size: 1.1rem; font-weight: 700; color: var(--green-dark); }
+  .qty-row { margin-top: auto; display: flex; align-items: center; gap: 8px; }
+  .qty-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+    background: #fff; cursor: pointer; font-size: 1.1rem; font-weight: 600;
+  }
+  .qty-btn:hover { border-color: var(--green); color: var(--green-dark); }
+  .qty-val { min-width: 24px; text-align: center; font-weight: 600; }
+  .add-btn {
+    flex: 1; height: 32px; border-radius: 8px; border: none;
+    background: var(--green); color: #fff; font-weight: 600; cursor: pointer;
+  }
+  .add-btn:hover { background: var(--green-dark); }
+
+  /* Cart drawer */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.4);
+    display: none; z-index: 40;
+  }
+  .overlay.show { display: block; }
+  .drawer {
+    position: fixed; top: 0; right: 0; height: 100%; width: min(400px, 100%);
+    background: #fff; z-index: 50; transform: translateX(100%);
+    transition: transform .25s; display: flex; flex-direction: column;
+    box-shadow: -8px 0 24px rgba(0,0,0,.12);
+  }
+  .drawer.show { transform: translateX(0); }
+  .drawer-head {
+    padding: 16px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .drawer-head h2 { font-size: 1.1rem; }
+  .close-btn {
+    background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--muted);
+  }
+  .drawer-items { flex: 1; overflow-y: auto; padding: 12px 16px; }
+  .empty { color: var(--muted); text-align: center; padding: 40px 0; }
+  .cart-item {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .cart-item .info { flex: 1; font-size: 0.9rem; }
+  .cart-item .info small { color: var(--muted); display: block; }
+  .cart-item .qty-row { margin-top: 0; }
+  .remove-btn {
+    background: none; border: none; color: #dc2626; cursor: pointer; font-size: 0.8rem;
+  }
+  .drawer-foot {
+    padding: 16px; border-top: 1px solid var(--border); background: #fafafa;
+  }
+  .total-row {
+    display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 6px;
+  }
+  .drawer-foot .addr { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; }
+  .order-btn {
+    width: 100%; padding: 12px; border: none; border-radius: 10px;
+    background: var(--wa); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer;
+  }
+  .order-btn:disabled { background: #d1d5db; cursor: not-allowed; }
+
+  /* Address modal */
+  .modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.5);
+    display: none; align-items: center; justify-content: center;
+    z-index: 60; padding: 16px;
+  }
+  .modal.show { display: flex; }
+  .modal-box {
+    background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 420px;
+  }
+  .modal-box h2 { color: var(--green-dark); margin-bottom: 6px; }
+  .modal-box p { color: var(--muted); font-size: 0.9rem; margin-bottom: 14px; }
+  .modal-box textarea {
+    width: 100%; min-height: 100px; padding: 10px; border-radius: 10px;
+    border: 1px solid var(--border); font: inherit; resize: vertical;
+  }
+  .modal-box textarea:focus { outline: 2px solid var(--green); border-color: transparent; }
+  .modal-box .primary {
+    margin-top: 14px; width: 100%; padding: 12px; border: none; border-radius: 10px;
+    background: var(--green); color: #fff; font-weight: 700; cursor: pointer;
+  }
+  .modal-box .primary:disabled { background: #d1d5db; cursor: not-allowed; }
+  .hint { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+  /* Floating WhatsApp */
+  .wa-float {
+    position: fixed; right: 20px; bottom: 20px; width: 60px; height: 60px;
+    border-radius: 50%; background: var(--wa); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 18px rgba(37,211,102,.45); z-index: 30; text-decoration: none;
+  }
+  .wa-float:hover { transform: scale(1.06); }
+  .wa-float svg { width: 32px; height: 32px; fill: #fff; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="top-bar">
+      <div class="brand-wrap">
+        <img class="logo" src="logo.png" alt="Umer MediCare logo">
+        <div class="brand">Umer <span>MediCare</span></div>
+      </div>
+      <button class="cart-btn" id="openCart">Cart (<span id="cartCount">0</span>)</button>
+    </div>
+    <div class="address-line" id="addressLine"></div>
+    <div class="controls">
+      <input type="search" id="search" placeholder="Search medicines...">
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="tablet">Tablets</button>
+        <button class="filter-btn" data-filter="syrup">Syrups</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<!-- Cart drawer -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Cart">
+  <div class="drawer-head">
+    <h2>Your Cart</h2>
+    <button class="close-btn" id="closeCart" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer-items" id="cartItems"></div>
+  <div class="drawer-foot">
+    <div class="total-row"><span>Total</span><span id="cartTotal">Rs 0</span></div>
+    <div class="addr" id="cartAddr"></div>
+    <button class="order-btn" id="orderBtn" disabled>Order on WhatsApp</button>
+  </div>
+</aside>
+
+<!-- Address modal (shown at start) -->
+<div class="modal show" id="addressModal">
+  <div class="modal-box">
+    <h2>Delivery Address</h2>
+    <p>Please enter your address before shopping. It will be included in your WhatsApp order.</p>
+    <textarea id="addressInput" placeholder="House no, street, area, city"></textarea>
+    <div class="hint" id="addressHint">Minimum 10 characters.</div>
+    <button class="primary" id="saveAddress" disabled>Continue to Shop</button>
+  </div>
+</div>
+
+<!-- Floating WhatsApp button -->
+<a class="wa-float" id="waFloat" href="https://wa.me/923360216558" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.87 9.87 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.13c-.25.7-1.45 1.34-2 1.4-.52.06-1.18.09-1.9-.12-.44-.14-1-.32-1.73-.64-3.04-1.31-5.02-4.38-5.17-4.59-.15-.2-1.24-1.65-1.24-3.15 0-1.5.78-2.23 1.06-2.54.28-.31.6-.38.8-.38h.58c.19 0 .44-.07.69.53.25.6.85 2.08.93 2.23.07.15.12.33.02.53-.1.2-.15.33-.3.5-.15.18-.31.39-.45.53-.15.15-.3.31-.13.61.17.3.75 1.24 1.61 2 1.1.98 2.03 1.29 2.33 1.43.3.15.47.12.65-.07.17-.2.75-.87.95-1.17.2-.3.4-.25.67-.15.27.1 1.73.82 2.03.97.3.15.5.22.57.35.07.12.07.72-.18 1.42z"/></svg>
+</a>
+
+<script>
+  const WHATSAPP_NUMBER = "923360216558";
+
+  // ---------- Build generic product list ----------
+  const tabletNames = [
+    "Paracetamol","Ibuprofen","Diclofenac","Naproxen","Aspirin","Cetirizine","Loratadine",
+    "Famotidine","Pantoprazole","Ranitidine","Metformin","Glimepiride","Gliclazide","Amlodipine",
+    "Losartan","Atenolol","Metoprolol","Lisinopril","Furosemide","Simvastatin","Atorvastatin",
+    "Rosuvastatin","Clopidogrel","Azithromycin","Ciprofloxacin","Levofloxacin","Metronidazole",
+    "Cefixime","Doxycycline","Fluconazole","Albendazole","Ondansetron","Domperidone",
+    "Levocetirizine","Montelukast","Prednisolone","Dexamethasone","Tramadol","Mefenamic Acid",
+    "Hyoscine","Ferrous Fumarate"
+  ];
+  const tabletStrengths = ["25 mg","50 mg","100 mg","250 mg","500 mg"];
+
+  const syrupNames = [
+    "Paracetamol","Ibuprofen","Amoxicillin","Cough Relief","Cetirizine","Azithromycin",
+    "Multivitamin","Iron","Ambroxol","Dextromethorphan","Salbutamol","Loperamide","Ranitidine",
+    "Domperidone","Ondansetron","Albendazole","Calcium","Zinc","Vitamin D","Vitamin C",
+    "Antacid","Montelukast","Prednisolone","Chlorpheniramine","Bromhexine"
+  ];
+  const syrupSizes = ["60 ml","100 ml","120 ml","200 ml"];
+
+  const products = [];
+
+  // Tablets: 40 names x 5 strengths = 200
+  tabletNames.forEach((name, i) => {
+    tabletStrengths.forEach((s, j) => {
+      products.push({ type: "tablet", name: `${name} ${s} Tablet` });
+    });
+  });
+
+  // Syrups: 25 names x 4 sizes = 100
+  syrupNames.forEach((name) => {
+    syrupSizes.forEach((s) => {
+      products.push({ type: "syrup", name: `${name} Syrup ${s}` });
+    });
+  });
+
+  // Assign stable prices in PKR (Rs 50 to Rs 1,900, rounded to Rs 5)
+  products.forEach((p, i) => {
+    const base = 50 + ((i * 97 + 13) % 1850);
+    p.price = Math.round(base / 5) * 5;
+    p.id = i + 1;
+  });
+
+  // ---------- State ----------
+  let address = "";
+  let filter = "all";
+  let query = "";
+  const cart = {}; // id -> qty
+  const cardQty = {}; // id -> qty selected on card before adding
+
+  const $ = (id) => document.getElementById(id);
+  const money = (n) => "Rs " + n.toLocaleString("en-PK");
+
+  // ---------- Address modal ----------
+  const addrInput = $("addressInput");
+  const saveAddr = $("saveAddress");
+  addrInput.addEventListener("input", () => {
+    const ok = addrInput.value.trim().length >= 10;
+    saveAddr.disabled = !ok;
+    $("addressHint").textContent = ok ? "Looks good." : "Minimum 10 characters.";
+  });
+  saveAddr.addEventListener("click", () => {
+    address = addrInput.value.trim();
+    $("addressModal").classList.remove("show");
+    renderAddress();
+    renderCart();
+  });
+  function renderAddress() {
+    $("addressLine").innerHTML = `Delivering to: ${escapeHtml(address)} <button id="changeAddr">Change</button>`;
+    $("changeAddr").addEventListener("click", () => {
+      addrInput.value = address;
+      addrInput.dispatchEvent(new Event("input"));
+      $("addressModal").classList.add("show");
+    });
+    $("cartAddr").textContent = "Deliver to: " + address;
+  }
+
+  // ---------- Product grid ----------
+  function visibleProducts() {
+    return products.filter((p) =>
+      (filter === "all" || p.type === filter) &&
+      p.name.toLowerCase().includes(query)
+    );
+  }
+
+  function renderGrid() {
+    const list = visibleProducts();
+    $("count").textContent = `${list.length} medicines`;
+    $("grid").innerHTML = list.map((p) => {
+      const q = cardQty[p.id] || 1;
+      const img = p.type === "syrup" ? "syrup.jpg" : "tablet.jpg";
+      return `
+        <div class="card">
+          <img src="${img}" alt="${escapeHtml(p.name)}" loading="lazy">
+          <div class="card-body">
+            <span class="tag">${p.type}</span>
+            <div class="name">${escapeHtml(p.name)}</div>
+            <div class="price">${money(p.price)}</div>
+            <div class="qty-row">
+              <button class="qty-btn" data-act="dec" data-id="${p.id}">−</button>
+              <span class="qty-val" id="cq-${p.id}">${q}</span>
+              <button class="qty-btn" data-act="inc" data-id="${p.id}">+</button>
+              <button class="add-btn" data-act="add" data-id="${p.id}">Add</button>
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  $("grid").addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-act]");
+    if (!btn) return;
+    const id = Number(btn.dataset.id);
+    const act = btn.dataset.act;
+    if (act === "inc") cardQty[id] = (cardQty[id] || 1) + 1;
+    if (act === "dec") cardQty[id] = Math.max(1, (cardQty[id] || 1) - 1);
+    if (act === "add") {
+      cart[id] = (cart[id] || 0) + (cardQty[id] || 1);
+      cardQty[id] = 1;
+      renderCart();
+    }
+    const label = $("cq-" + id);
+    if (label) label.textContent = cardQty[id] || 1;
+  });
+
+  // ---------- Filters & search ----------
+  document.querySelectorAll(".filter-btn").forEach((b) => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll(".filter-btn").forEach((x) => x.classList.remove("active"));
+      b.classList.add("active");
+      filter = b.dataset.filter;
+      renderGrid();
+    });
+  });
+  $("search").addEventListener("input", (e) => {
+    query = e.target.value.trim().toLowerCase();
+    renderGrid();
+  });
+
+  // ---------- Cart ----------
+  function cartLines() {
+    return Object.keys(cart).map((id) => {
+      const p = products.find((x) => x.id === Number(id));
+      return { ...p, qty: cart[id] };
+    });
+  }
+
+  function renderCart() {
+    const lines = cartLines();
+    const count = lines.reduce((s, l) => s + l.qty, 0);
+    const total = lines.reduce((s, l) => s + l.qty * l.price, 0);
+    $("cartCount").textContent = count;
+    $("cartTotal").textContent = money(total);
+
+    $("cartItems").innerHTML = lines.length === 0
+      ? `<div class="empty">Your cart is empty.</div>`
+      : lines.map((l) => `
+        <div class="cart-item">
+          <div class="info">
+            ${escapeHtml(l.name)}
+            <small>${money(l.price)} each</small>
+            <button class="remove-btn" data-remove="${l.id}">Remove</button>
+          </div>
+          <div class="qty-row">
+            <button class="qty-btn" data-cart="dec" data-id="${l.id}">−</button>
+            <span class="qty-val">${l.qty}</span>
+            <button class="qty-btn" data-cart="inc" data-id="${l.id}">+</button>
+          </div>
+        </div>`).join("");
+
+    $("orderBtn").disabled = lines.length === 0 || !address;
+  }
+
+  $("cartItems").addEventListener("click", (e) => {
+    const rem = e.target.closest("[data-remove]");
+    if (rem) { delete cart[rem.dataset.remove]; renderCart(); return; }
+    const btn = e.target.closest("[data-cart]");
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.cart === "inc") cart[id] += 1;
+    if (btn.dataset.cart === "dec") {
+      cart[id] -= 1;
+      if (cart[id] <= 0) delete cart[id];
+    }
+    renderCart();
+  });
+
+  // ---------- Drawer ----------
+  function openCart() {
+    $("drawer").classList.add("show");
+    $("overlay").classList.add("show");
+  }
+  function closeCart() {
+    $("drawer").classList.remove("show");
+    $("overlay").classList.remove("show");
+  }
+  $("openCart").addEventListener("click", openCart);
+  $("closeCart").addEventListener("click", closeCart);
+  $("overlay").addEventListener("click", closeCart);
+
+  // ---------- WhatsApp order ----------
+  $("orderBtn").addEventListener("click", () => {
+    const lines = cartLines();
+    if (lines.length === 0 || !address) return;
+    const itemLines = lines.map((l) => `${l.qty}x ${l.name}`).join("\n");
+    const message =
+      `Hello, I would like to order:\n\n${itemLines}\n\nDelivery address:\n${address}`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener");
+  });
+
+  // ---------- Helpers ----------
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  // ---------- Init ----------
+  renderGrid();
+  renderCart();
+</script>
+</body>
+</html>
